@@ -11,14 +11,14 @@ export const Footer: React.FC = () => {
               <span class="text-xl font-bold text-[#111318] dark:text-white">PrimeStore</span>
             </div>
             <p class="text-sm leading-6 text-gray-600 dark:text-gray-400">
-              Making the world a better place through constructing elegant hierarchies.
+              Hardcoded with precision and coffee by Jayson.
             </p>
             <div class="flex space-x-4 pt-2">
               <a href="#" class="text-gray-400 hover:text-primary transition-colors">
-                <span class="material-symbols-outlined text-[20px]">public</span>
+                <span class="material-symbols-outlined text-[20px]">code</span>
               </a>
               <a href="#" class="text-gray-400 hover:text-primary transition-colors">
-                <span class="material-symbols-outlined text-[20px]">share</span>
+                <span class="material-symbols-outlined text-[20px]">public</span>
               </a>
             </div>
           </div>
@@ -42,7 +42,7 @@ export const Footer: React.FC = () => {
             <div>
               <h3 class="text-sm font-semibold leading-6 text-[#111318] dark:text-white">Company</h3>
               <ul role="list" class="mt-4 space-y-3">
-                <li><a href="#" class="text-sm leading-6 text-gray-600 dark:text-gray-400 hover:text-primary">About Us</a></li>
+                <li><a href="#" class="text-sm leading-6 text-gray-600 dark:text-gray-400 hover:text-primary">About Jayson</a></li>
                 <li><a href="#" class="text-sm leading-6 text-gray-600 dark:text-gray-400 hover:text-primary">Sustainability</a></li>
                 <li><a href="#" class="text-sm leading-6 text-gray-600 dark:text-gray-400 hover:text-primary">Press</a></li>
               </ul>
@@ -50,20 +50,22 @@ export const Footer: React.FC = () => {
             <div>
               <h3 class="text-sm font-semibold leading-6 text-[#111318] dark:text-white">Legal</h3>
               <ul role="list" class="mt-4 space-y-3">
-                <li><a href="#" class="text-sm leading-6 text-gray-600 dark:text-gray-400 hover:text-primary">Privacy</a></li>
+                <li><a href="#" class="text-sm leading-6 text-gray-600 dark:text-gray-400 hover:text-primary">MIT License</a></li>
                 <li><a href="#" class="text-sm leading-6 text-gray-600 dark:text-gray-400 hover:text-primary">Terms</a></li>
               </ul>
             </div>
           </div>
         </div>
         <div class="mt-16 border-t border-gray-100 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p class="text-xs leading-5 text-gray-500 dark:text-gray-500">© 2024 PrimeStore Inc. All rights reserved.</p>
+          <p class="text-xs leading-5 text-gray-500 dark:text-gray-500">© 2024 Created by Jayson. Licensed under MIT.</p>
           <div class="flex gap-4">
             <div class="flex items-center gap-1 text-slate-400 text-xs font-semibold">
-                <span class="material-symbols-outlined !text-[24px]">credit_card</span>
+                <span class="material-symbols-outlined !text-[24px]">terminal</span>
+                <span>Source</span>
             </div>
             <div class="flex items-center gap-1 text-slate-400 text-xs font-semibold">
-                <span class="material-symbols-outlined !text-[24px]">payments</span>
+                <span class="material-symbols-outlined !text-[24px]">lock</span>
+                <span>Secure</span>
             </div>
           </div>
         </div>
