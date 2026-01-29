@@ -1,6 +1,6 @@
 # PrimeStore by Jayson
 
-**License:** MIT | **Creator:** Jayson
+**Creator:** Jayson
 
 A premium e-commerce experience meticulously crafted. This repository contains everything you need to run the **Hardcoded Edition** of PrimeStore locally.
 
@@ -10,6 +10,3 @@ A premium e-commerce experience meticulously crafted. This repository contains e
 - **Zero Critical Bugs:** Simplicity ensures stability.
 - **Lifetime Support:** Backed by Jayson's commitment to quality.
 
-## License
-
-Distributed under the MIT License. See `LICENSE` for more information.
