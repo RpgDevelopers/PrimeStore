@@ -1,30 +1,48 @@
-import React, { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useShop } from '../context/ShopContext';
 
-export const ProductPage: React.FC<{ addToCart: (item: any) => void }> = ({ addToCart }) => {
+export const ProductPage: React.FC = () => {
   const { id } = useParams();
-  const [selectedSize, setSelectedSize] = useState('M');
+  const navigate = useNavigate();
+  const { products, addToCart } = useShop();
+  
+  const product = products.find(p => p.id === id);
+  
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
+  const [mainImage, setMainImage] = useState<string>('');
 
-  // Mocking the product data based on the provided design
-  const product = {
-    id: id || '1',
-    name: 'Minimalist Wool Overcoat',
-    price: 249.00,
-    rating: 4.8,
-    reviews: 128,
-    description: "Expertly crafted from premium Italian wool blend. This overcoat features a structured silhouette, notched lapels, and a hidden button placket for a clean, modern aesthetic. Perfect for layering over suits or casual wear.",
-    color: 'Charcoal Grey',
-    images: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCQ8XKWPpZFEWii7OTtbmiMiotcO0Hwwr0yKW9HtdCkCljHC5i9M-88CYoa58Y41azkEfaIZ-xg6DHFBvDlndOoiDygAPyrIV1sKlFrlaXQF8hoKL7UhPZSxSO_tFqQApZ3AVxvlUUEBB8JsDQKw4Wdzqy18ryvkUqgdHZ1lGefHGLrtKk9dBm_QPfsnqpEhJsN3VSy843AdSP6e20fSoyDOQ2kBUgxhZ3RRjluYJikvGOET-oh5VDUI4klsGGLyWDhrNjYsEm9nLj5',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuD4brx2mcjzgMdxZNVdE5AjiafHbOnz-T_VeCldRTQXkxvd_2KL11cqfQ3y1zyXmDrVby2RQKSYyj1C0nOb372-TGtTDdvJZBPe3M2wEOOZ-OeSxwxmiOaWdLijsEBJSt19UAUk1BKGesFUloZQmxXXQiZsx_YPQ_5dN1kZfZKaQ8qgAW6bColodcd1GlGHtJsHHi5VOq6mp08c4rtp8wANjpv1L1xBD4NVOsnD0F-IpPeM9oJ6YaLhFT6TMiE-S3Fbu9WTqnNM9gEk',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuD6fmTEa-2YC6Df5vKB5zYg5fSey6EALLrQn-58ZcWH65kWWhRh7K7YUFudGaBBjTHHLcYgFMgoNYdwrbNJX87u7g0GuR1lSf4pB6PaenZJLeWYVlCLbr5lrva9eDjTyJh8q_fE8mCuPOL0I2kJYi-iE1OWg5eYqu1o8WltrtItR4ubYMJEF_3BrzXqoEpgvBqjEMhuXVzAys4-qBo2chn3xXf9YImry60TyPHsbtBXaG11Io-89XEibtuIv7A1K4UXEPnmPuhDycNH',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCLFvOO-ZTJWyaaEfH43BwstrsmJTGh7OYMKCE4TZXyvaLc2dofCkKyUfCHO_sb2mZjDO1PseAk8vOEEtMs_yFAJtp5DpbEMxCK1NFN0xl7u27OhHLyFalECMStHUE9Sfdijw2URrjWJ7hzSrDVMcbMrvJIHveAZIYbEybE2B4kezUGsW6sc3sYov3qFjszec_zu1RXVScWbLokAie9bo6MwuBkiS9bkyaeOZsgBKotBPGE-_TOdHOLwmjUiCUSWT72yeltiVUb7Tfk',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDjdasTxAb3DO_GdmsOwKJIXXRdCLa7Gqc6of2S7eXlHu63j_Hn-WwvKDGr6QgjmMTbHQU11GpRrxb2WmvoSc-9XB5xfZQIVrn65nvIU1mt5jHpnlbMnzQLqOrvlOuXOzXZZkmAOejGJ8_eTzo6FQ7G0YgvchmB2O3DCILNexTS7b4PHaBQ7RaDV_NHbFOoOhf64C_QKjcwJXKR7BxQke_bI97lyy0ALyTBcy3mDobq9GKGrQ1D1euIV8uuz7DDD2HRudKFZ1xXTpTC'
-    ]
+  // Initialize state when product loads
+  useEffect(() => {
+    if (product) {
+      setMainImage(product.image);
+      if (product.sizes && product.sizes.length > 0) setSelectedSize(product.sizes[2] || product.sizes[0]); // Default to M or first
+      if (product.colors && product.colors.length > 0) setSelectedColor(product.colors[0]);
+    }
+  }, [product]);
+
+  if (!product) {
+    return (
+        <div class="min-h-[50vh] flex flex-col items-center justify-center">
+            <h2 class="text-2xl font-bold mb-4 dark:text-white">Product not found</h2>
+            <Link to="/shop" class="text-primary hover:underline">Back to Shop</Link>
+        </div>
+    );
+  }
+  
+  // Use products images array if available, otherwise just duplicate the main image for the gallery effect
+  const galleryImages = product.images && product.images.length > 0 
+    ? product.images 
+    : [product.image, product.image, product.image, product.image];
+
+  const handleAddToCart = () => {
+    addToCart(product, quantity, selectedColor, selectedSize);
+    // Optional: Show success feedback or open cart drawer
+    // For now, let's navigate to cart
+    navigate('/cart');
   };
-
-  const [mainImage, setMainImage] = useState(product.images[0]);
 
   return (
     <div class="w-full flex justify-center py-8 bg-background-light dark:bg-background-dark">
@@ -35,7 +53,7 @@ export const ProductPage: React.FC<{ addToCart: (item: any) => void }> = ({ addT
           <span class="text-[#636f88] dark:text-gray-600">/</span>
           <Link to="/shop" class="text-[#636f88] dark:text-gray-400 font-medium hover:text-primary transition-colors">Men</Link>
           <span class="text-[#636f88] dark:text-gray-600">/</span>
-          <span class="text-[#111318] dark:text-white font-medium">Outerwear</span>
+          <span class="text-[#111318] dark:text-white font-medium">{product.category}</span>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
@@ -46,13 +64,15 @@ export const ProductPage: React.FC<{ addToCart: (item: any) => void }> = ({ addT
                 class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
                 style={{ backgroundImage: `url('${mainImage}')` }}
               ></div>
-              <div class="absolute top-4 left-4">
-                <span class="bg-white dark:bg-[#111621] text-[#111318] dark:text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">New Arrival</span>
-              </div>
+              {product.isNew && (
+                  <div class="absolute top-4 left-4">
+                    <span class="bg-white dark:bg-[#111621] text-[#111318] dark:text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">New Arrival</span>
+                  </div>
+              )}
             </div>
             
             <div class="grid grid-cols-4 gap-3 md:gap-4">
-              {product.images.slice(1).map((img, i) => (
+              {galleryImages.map((img, i) => (
                 <button 
                   key={i} 
                   onClick={() => setMainImage(img)}
@@ -77,7 +97,7 @@ export const ProductPage: React.FC<{ addToCart: (item: any) => void }> = ({ addT
                              <span key={i} class="material-symbols-outlined text-[20px] fill-current" style={{fontVariationSettings: "'FILL' 1"}}>star</span>
                           ))}
                         </div>
-                        <a href="#reviews" class="text-sm text-[#636f88] dark:text-gray-400 hover:text-primary ml-1 underline underline-offset-2">({product.reviews} Reviews)</a>
+                        <a href="#reviews" class="text-sm text-[#636f88] dark:text-gray-400 hover:text-primary ml-1 underline underline-offset-2">({product.reviews || 0} Reviews)</a>
                     </div>
                  </div>
                  <p class="text-[#636f88] dark:text-gray-400 text-base leading-relaxed">{product.description}</p>
@@ -87,11 +107,16 @@ export const ProductPage: React.FC<{ addToCart: (item: any) => void }> = ({ addT
               <div class="flex flex-col gap-6 mb-8">
                 {/* Color */}
                 <div>
-                   <span class="block text-sm font-bold text-[#111318] dark:text-white mb-3">Color: <span class="font-normal text-[#636f88] dark:text-gray-400">{product.color}</span></span>
+                   <span class="block text-sm font-bold text-[#111318] dark:text-white mb-3">Color</span>
                    <div class="flex gap-3">
-                      <button class="w-10 h-10 rounded-full bg-[#4a4a4a] ring-2 ring-offset-2 ring-primary dark:ring-offset-[#111621] ring-offset-white"></button>
-                      <button class="w-10 h-10 rounded-full bg-[#1a1a1a] hover:ring-2 hover:ring-offset-2 hover:ring-gray-300 dark:hover:ring-gray-600 dark:ring-offset-[#111621] transition-all"></button>
-                      <button class="w-10 h-10 rounded-full bg-[#d1cbb8] hover:ring-2 hover:ring-offset-2 hover:ring-gray-300 dark:hover:ring-gray-600 dark:ring-offset-[#111621] transition-all"></button>
+                      {product.colors.map(color => (
+                          <button 
+                            key={color}
+                            onClick={() => setSelectedColor(color)}
+                            class={`w-10 h-10 rounded-full ring-offset-2 ring-offset-white dark:ring-offset-[#111621] transition-all ${selectedColor === color ? 'ring-2 ring-primary' : 'hover:ring-2 hover:ring-gray-300'}`}
+                            style={{ backgroundColor: color }}
+                          ></button>
+                      ))}
                    </div>
                 </div>
                 {/* Size */}
@@ -101,7 +126,7 @@ export const ProductPage: React.FC<{ addToCart: (item: any) => void }> = ({ addT
                       <button class="text-sm font-medium text-primary hover:text-blue-700 underline">Size Guide</button>
                    </div>
                    <div class="grid grid-cols-5 gap-2">
-                      {['XS', 'S', 'M', 'L', 'XL'].map(size => (
+                      {product.sizes?.map(size => (
                         <button 
                           key={size}
                           onClick={() => setSelectedSize(size)}
@@ -126,7 +151,7 @@ export const ProductPage: React.FC<{ addToCart: (item: any) => void }> = ({ addT
                     </button>
                 </div>
                 <button 
-                  onClick={() => addToCart({ ...product, quantity, selectedSize })}
+                  onClick={handleAddToCart}
                   class="flex-1 h-12 bg-primary hover:bg-blue-700 text-white font-bold rounded-lg shadow-md transition-colors flex items-center justify-center gap-2"
                 >
                     <span>Add to Cart</span>
@@ -173,17 +198,17 @@ export const ProductPage: React.FC<{ addToCart: (item: any) => void }> = ({ addT
           </div>
         </div>
 
-        {/* Complete the Look */}
+        {/* Complete the Look (Mocked for now as logic is complex) */}
         <div class="mt-24 mb-16 border-t border-[#f0f2f4] dark:border-[#222831] pt-16">
            <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
               <div>
                  <h3 class="text-2xl font-bold text-[#111318] dark:text-white mb-2">Complete the Look</h3>
                  <p class="text-[#636f88] dark:text-gray-400">Curated essentials that pair perfectly.</p>
               </div>
-              <a href="#" class="text-primary font-bold hover:underline flex items-center gap-1">
+              <Link to="/shop" class="text-primary font-bold hover:underline flex items-center gap-1">
                  View All
                  <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-              </a>
+              </Link>
            </div>
            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
               {[

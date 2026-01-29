@@ -69,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({ cartCount }) => {
             >
               <span class="material-symbols-outlined">shopping_bag</span>
               {cartCount > 0 && (
-                <span class="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white ring-2 ring-white dark:ring-background-dark">
+                <span class="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white ring-2 ring-white dark:ring-background-dark animate-fade-in">
                   {cartCount}
                 </span>
               )}

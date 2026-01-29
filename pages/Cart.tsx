@@ -1,43 +1,39 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useShop } from '../context/ShopContext';
 
 export const Cart: React.FC = () => {
-  // Hardcoded cart data based on design
-  const cartItems = [
-    {
-      id: 1,
-      name: 'Ergonomic Office Chair',
-      price: 250.00,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAQXeNtqRDOiSf7980rc32h8aW1zbh9kJnTTLuG3RVn4AOOxKtrqHZLghbw27Pkm2efYufmckDKSRCWxgICPagNuoO3H1kY-42i0Ea87OlVyoDVst7R6zIgbWFpg-veo1BdOzxQPvwYZDpUC2lebAQc8mNOBZrBEAn1Rs6--wXn3gu-W4CN3mT20TkNZXcqurgI6UB1EHkkVKoQAgSiXPEWOZCiD_AtRPIwv4qHskvBswkRZY30hx9uYMgVMKzNiOR4cEWNYGvRUH61',
-      options: ['Grey', 'Standard'],
-      quantity: 1
-    },
-    {
-      id: 2,
-      name: 'Wireless Mechanical Keyboard',
-      price: 120.00,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuALJhfOOkUoJsr7E_SkoNjkdCRkkONfNPrL_yNgYQLmutkPgR_LWlrlti3wFPr9qMpaMil1ggZkuPKtevxwhn0OloC6EmpOninp9xN1Eefm_Aaxh-lHoDcVQFC5zhgjFUJ59Qn4hCmvIQetNddRrcZMDEl4VBODAJdnlcqS9L7MeUPrWH7hOfBh3lzKwYO_ic1fv1gQv_FJ3wKDOPEICiwd4xPcOqqsxzd534o8GL5ydPYI2BZjMdqsAzVH6kgs9sS_Zk3xzTBpqSR9',
-      options: ['White', 'Brown Switch'],
-      quantity: 1
-    }
-  ];
+  const { cart, removeFromCart, updateQuantity, getCartTotal } = useShop();
 
-  const subtotal = 370.00;
-  const tax = 29.60;
-  const total = 399.60;
+  const subtotal = getCartTotal();
+  const tax = subtotal * 0.08; // 8% tax rate example
+  const total = subtotal + tax;
+
+  if (cart.length === 0) {
+      return (
+          <div class="flex-1 w-full flex flex-col items-center justify-center min-h-[60vh] px-4">
+              <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">shopping_bag</span>
+              <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Your cart is empty</h2>
+              <p class="text-slate-500 dark:text-slate-400 mb-8 text-center max-w-md">Looks like you haven't added anything to your cart yet.</p>
+              <Link to="/shop" class="rounded-lg bg-primary px-6 py-3 text-base font-bold text-white shadow-lg hover:bg-blue-800 transition-colors">
+                  Start Shopping
+              </Link>
+          </div>
+      );
+  }
 
   return (
     <div class="mx-auto max-w-7xl px-4 pb-24 pt-8 sm:px-6 lg:px-8 flex-1 w-full">
       <div class="mb-10">
         <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">Your Shopping Bag</h1>
-        <p class="mt-2 text-slate-500 dark:text-slate-400">2 items in your cart ready for checkout.</p>
+        <p class="mt-2 text-slate-500 dark:text-slate-400">{cart.reduce((acc, item) => acc + item.quantity, 0)} items in your cart ready for checkout.</p>
       </div>
 
       <div class="mt-12 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16">
         <section aria-labelledby="cart-heading" class="lg:col-span-7">
           <ul role="list" class="divide-y divide-gray-100 dark:divide-gray-800 border-t border-b border-gray-100 dark:border-gray-800">
-            {cartItems.map((item) => (
-              <li key={item.id} class="flex py-8 sm:py-10">
+            {cart.map((item) => (
+              <li key={`${item.id}-${item.selectedColor}-${item.selectedSize}`} class="flex py-8 sm:py-10">
                 <div class="shrink-0">
                   <div class="h-24 w-24 sm:h-32 sm:w-32 rounded-lg bg-gray-100 dark:bg-[#1e2532] overflow-hidden relative group">
                     <img src={item.image} alt={item.name} class="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-300" />
@@ -48,28 +44,43 @@ export const Cart: React.FC = () => {
                     <div>
                       <div class="flex justify-between">
                         <h3 class="text-base font-bold text-slate-900 dark:text-white">
-                          <a href="#" class="hover:text-primary transition-colors">{item.name}</a>
+                          <Link to={`/product/${item.id}`} class="hover:text-primary transition-colors">{item.name}</Link>
                         </h3>
                       </div>
-                      <div class="mt-1 flex text-sm text-slate-500 dark:text-slate-400">
-                         {item.options.map((opt, i) => (
-                            <p key={i} class={i < item.options.length - 1 ? 'border-r border-gray-200 dark:border-gray-700 pr-2 mr-2' : ''}>{opt}</p>
-                         ))}
+                      <div class="mt-1 flex text-sm text-slate-500 dark:text-slate-400 gap-2">
+                         {item.selectedColor && (
+                            <div class="flex items-center gap-1">
+                                <span class="w-3 h-3 rounded-full border border-gray-200" style={{ backgroundColor: item.selectedColor }}></span>
+                            </div>
+                         )}
+                         {item.selectedSize && (
+                            <span class={item.selectedColor ? 'border-l border-gray-200 dark:border-gray-700 pl-2' : ''}>{item.selectedSize}</span>
+                         )}
                       </div>
                       <p class="mt-2 text-lg font-bold text-slate-900 dark:text-white">${item.price.toFixed(2)}</p>
                     </div>
                     <div class="mt-4 sm:mt-0 sm:pr-9">
                       <div class="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg w-max bg-white dark:bg-[#1a2231]">
-                        <button class="p-2 text-slate-500 hover:text-primary transition-colors disabled:opacity-50">
+                        <button 
+                            onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedColor, item.selectedSize)}
+                            class="p-2 text-slate-500 hover:text-primary transition-colors disabled:opacity-50"
+                        >
                           <span class="material-symbols-outlined !text-[18px]">remove</span>
                         </button>
                         <input type="text" value={item.quantity} readOnly class="w-10 p-0 text-center text-sm font-medium border-0 focus:ring-0 bg-transparent text-slate-900 dark:text-white" />
-                        <button class="p-2 text-slate-500 hover:text-primary transition-colors">
+                        <button 
+                            onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedColor, item.selectedSize)}
+                            class="p-2 text-slate-500 hover:text-primary transition-colors"
+                        >
                           <span class="material-symbols-outlined !text-[18px]">add</span>
                         </button>
                       </div>
                       <div class="absolute right-0 top-0">
-                        <button type="button" class="-m-2 inline-flex p-2 text-slate-400 hover:text-red-500 transition-colors">
+                        <button 
+                            type="button" 
+                            onClick={() => removeFromCart(item.id, item.selectedColor, item.selectedSize)}
+                            class="-m-2 inline-flex p-2 text-slate-400 hover:text-red-500 transition-colors"
+                        >
                           <span class="sr-only">Remove</span>
                           <span class="material-symbols-outlined">delete</span>
                         </button>
@@ -111,7 +122,7 @@ export const Cart: React.FC = () => {
             </div>
             <div class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
               <dt class="flex text-sm text-slate-600 dark:text-slate-400">
-                <span>Tax estimate</span>
+                <span>Tax estimate (8%)</span>
               </dt>
               <dd class="text-sm font-medium text-slate-900 dark:text-white">${tax.toFixed(2)}</dd>
             </div>

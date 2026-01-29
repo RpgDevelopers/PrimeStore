@@ -1,62 +1,87 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Product } from '../types';
-
-const MOCK_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    name: 'The Classic Wool Overcoat',
-    price: 450,
-    category: 'Coats',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB-OFMQagd2qUMsIDmKPzlWteozvkVTCevPJM69PNS9gBpPrm9uGr5B-FHI862zI6wsudhYJkGCpD1abCOrtkhC3ArtJsv5Qb7J3B3xqBqAYn4aJ4Hu2dwZrUqVWDy8PW7yto4Vl1vC1eC3gkma41Y4D4KvST3vquVUUTjuYz56g8OQLPA194tC3ylm10DXDkN9xSIzyyytAO1L_8Y3eSvjwfxwZach6coT__tCDyBQ-w9h1XfxNGF-L3xklEFEviVTKjOdKU4_xIxw',
-    colors: ['#000000', '#9CA3AF']
-  },
-  {
-    id: '2',
-    name: 'Heritage Trench Coat',
-    price: 325,
-    category: 'Coats',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDaLx3PHYWsXX-yZ_86OsOdd0gD96EEBch0_1DCQwRSyLl2Nb3YkVgfMu2P4B-hGNnBxJLWI0kvOTwfnjp4yy52m2JbhJ9TOHcX2sqKxtZfAk6rY7fVF9YYKih9v5jnLzWyBpYwlXG_NNWC8zgS2GFw_BCm6yrJtVqTp9QAFyiwbC9bxrSp4qepxFZ85ztp2-3XS6P1IJXgMEelyY64qTk1WpN4bdsrFgRBXn0JkEYTbQdqgJ0-Z8rv9QOc3pQTl5HjQ-M849C4Aa4a',
-    colors: ['#d6d3d1', '#1e293b'],
-    isNew: true
-  },
-  {
-    id: '3',
-    name: 'Modern Biker Jacket',
-    price: 550,
-    category: 'Jackets',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuClB7XptQy1Hr8keBur7-3Gmes4cs9l2HBk0JsJ6qI7jUm7M4tM7qG4CSPACaHZmKbrTA-gVhi9YdYDVw5aDIgqW7hBYDKoMH6UjjtZFsK7Q-redp4rwcRFb7O9XHEtwxZnYr24XxVPrRKz189L4gIcjXMJQQRE709on2Bg8PW2XOXAPeMBXD-BYaJ23VC7VXYiRHcpZnbqyUlZ44Q0YA0swbVLRMK5rWzQZsi-WlLx_tE0L_34malWpaj7RPYQwhLHnOjIgddAu2GG',
-    colors: ['#000000']
-  },
-  {
-    id: '4',
-    name: 'Textured Knit Blazer',
-    price: 295,
-    category: 'Blazers',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD4foSWj2PwFZCIqegQJVILSNQj6pNjAuofh26iyx5QnHupR3HqazSYQRZb8eGcNAAj3MhqxhDkFKhhzm5l83OLALB6vzS_AJ_7xxe-_mAbdfgyiWQo1ylHkl--PA7PCoreV0pVh_W1ViakKWRa1IMlFLj4LmglbbJ8qagoAmWHsFmsUb4KLTCHvnlv60jT-JIMVy9V7kjhhqYMNoRuZI6M6uEbXFXtmjmspcxXGmkLH1rNuZdSLovanFGeiyt6-CfRTZHDMpaOi9r5',
-    colors: ['#6b7280', '#1e293b']
-  },
-  {
-    id: '5',
-    name: 'Alpine Down Jacket',
-    price: 380,
-    category: 'Jackets',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA8Ic1vXE4x0WLABRaeTpxi96-WgUp7x8P8EUuBNq--QfGc1kyZWIKQBDdkeuaRbk90M3odRe7JpNP6ALv9fbukUfXcAseZ_Udp_6dQilRq4kpgw7rBoBHBEAHRxquWpH787ExbOFsyBIvfNcSUuyvB9CtHs3klEqTSmjJLwYvqUCbFqnLHOW4i-XKpyYPyOoIaktm_ITqv_zWIzjRR3aaUv-oZTcYg2B_9ijBpCyfQrPR1bWBQ6QxowMnLIIO3wcYmtAU8LrU3Gxuu',
-    colors: ['#92400e', '#000000'],
-    isBestSeller: true
-  },
-  {
-    id: '6',
-    name: 'Technical Bomber',
-    price: 220,
-    category: 'Jackets',
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD38BK7vCcrAyvWwRYHKmV5VhBePZIpoI06jZ9ntTeJoUzyeaUD5S6dIuKHP3YdUgSDRd5V5_A6m7NN5njj0P6FFw79VGC133Eg9osugrEZYjYPfgnaDvspPcpE68LCz_J5M2vIGQjU1Uz2BmFJ9DYhbj3xgiOUiAnNXXfSeeX1bdUzvblx4aLo1ew40qiQjBf7OhBWGODOqTpfgJCeT4wdTH9JBkzzk4Oe14nY-rhnuGNUcmoTOrYvxS1dCtjqSG1DK_1NFcGBBKca',
-    colors: ['#1e293b', '#3f6212']
-  }
-];
+import { useShop } from '../context/ShopContext';
 
 export const Shop: React.FC = () => {
-  const [priceRange, setPriceRange] = useState(450);
+  const { products, addToCart } = useShop();
+  const [priceRange, setPriceRange] = useState(1000);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState('Recommended');
+
+  // Constants for filters
+  const CATEGORIES = ['Coats', 'Jackets', 'Blazers', 'Leather'];
+  const COLORS = [
+    { name: 'Black', hex: '#000000' },
+    { name: 'Navy', hex: '#1e293b' },
+    { name: 'Brown', hex: '#92400e' },
+    { name: 'Beige', hex: '#d6d3d1' },
+    { name: 'White', hex: '#f1f5f9' },
+    { name: 'Grey', hex: '#9CA3AF' },
+    { name: 'Green', hex: '#3f6212' },
+  ];
+  const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+  const toggleFilter = (item: string, currentList: string[], setter: React.Dispatch<React.SetStateAction<string[]>>) => {
+      if (currentList.includes(item)) {
+          setter(currentList.filter(i => i !== item));
+      } else {
+          setter([...currentList, item]);
+      }
+  };
+
+  const filteredProducts = useMemo(() => {
+    let result = products;
+
+    // Filter by Category
+    if (selectedCategories.length > 0) {
+      result = result.filter(p => selectedCategories.includes(p.category));
+    }
+
+    // Filter by Price
+    result = result.filter(p => p.price <= priceRange);
+
+    // Filter by Color (check if product has ANY of the selected colors)
+    // Note: Simple hex matching for now, in a real app might need normalization
+    if (selectedColors.length > 0) {
+        result = result.filter(p => p.colors.some(c => 
+            selectedColors.some(selected => {
+                // Mapping selected color names to rough hexes or logic
+                // For simplicity, we assume the data uses hexes and UI uses hexes or mapping
+                // Let's just check if the product color array includes the hex code
+                const colorObj = COLORS.find(col => col.name === selected);
+                return colorObj ? p.colors.includes(colorObj.hex) : false; 
+                // Wait, logic above: selectedColors is array of HEXES from the UI click
+                // Actually let's store names or hexes. UI uses hexes for buttons.
+                // Let's simplify: selectedColors stores HEX codes.
+                return p.colors.includes(selected);
+            })
+        ));
+    }
+    
+    // Simplification for the color filter in this demo:
+    // If selectedColors contains a hex that is in product.colors
+    if (selectedColors.length > 0) {
+        result = result.filter(p => p.colors.some(c => selectedColors.includes(c)));
+    }
+
+    // Filter by Size
+    if (selectedSizes.length > 0) {
+        result = result.filter(p => p.sizes && p.sizes.some(s => selectedSizes.includes(s)));
+    }
+
+    // Sort
+    if (sortBy === 'Price: Low to High') {
+        result = [...result].sort((a, b) => a.price - b.price);
+    } else if (sortBy === 'Price: High to Low') {
+        result = [...result].sort((a, b) => b.price - a.price);
+    } else if (sortBy === 'Newest Arrivals') {
+        result = [...result].sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+    }
+
+    return result;
+  }, [products, selectedCategories, priceRange, selectedColors, selectedSizes, sortBy]);
 
   return (
     <div class="max-w-[1440px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
@@ -72,12 +97,17 @@ export const Shop: React.FC = () => {
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h2 class="text-3xl md:text-4xl font-serif font-bold text-gray-900 dark:text-white mb-2">Men's Outerwear</h2>
-            <p class="text-gray-500 dark:text-gray-400 text-sm">Showing {MOCK_PRODUCTS.length} products</p>
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Showing {filteredProducts.length} products</p>
           </div>
           <div class="flex items-center gap-3">
             <label htmlFor="sort" class="sr-only">Sort by</label>
             <div class="relative min-w-[180px]">
-              <select id="sort" class="w-full appearance-none bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2.5 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm font-medium cursor-pointer">
+              <select 
+                id="sort" 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                class="w-full appearance-none bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white py-2.5 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm font-medium cursor-pointer"
+              >
                 <option>Recommended</option>
                 <option>Newest Arrivals</option>
                 <option>Price: Low to High</option>
@@ -102,9 +132,14 @@ export const Shop: React.FC = () => {
                 <span class="material-symbols-outlined text-[20px] text-gray-400">remove</span>
               </h3>
               <div class="space-y-3">
-                {['Jackets & Coats', 'Blazers', 'Trench Coats', 'Leather'].map((cat, i) => (
+                {CATEGORIES.map((cat, i) => (
                   <label key={cat} class="flex items-center gap-3 cursor-pointer group">
-                    <input type="checkbox" defaultChecked={i === 0} class="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary bg-transparent" />
+                    <input 
+                        type="checkbox" 
+                        checked={selectedCategories.includes(cat)}
+                        onChange={() => toggleFilter(cat, selectedCategories, setSelectedCategories)}
+                        class="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary bg-transparent" 
+                    />
                     <span class="text-sm text-gray-600 dark:text-gray-300 group-hover:text-primary transition-colors">{cat}</span>
                   </label>
                 ))}
@@ -149,14 +184,15 @@ export const Shop: React.FC = () => {
                 <span class="material-symbols-outlined text-[20px] text-gray-400">remove</span>
               </h3>
               <div class="grid grid-cols-5 gap-3">
-                {[
-                  { name: 'Black', bg: 'bg-black' },
-                  { name: 'Navy', bg: 'bg-[#1e293b]' },
-                  { name: 'Brown', bg: 'bg-[#92400e]' },
-                  { name: 'Beige', bg: 'bg-[#d6d3d1]' },
-                  { name: 'White', bg: 'bg-[#f1f5f9]' }
-                ].map((col) => (
-                  <button key={col.name} aria-label={col.name} class={`w-8 h-8 rounded-full ${col.bg} border border-gray-200 dark:border-gray-700 hover:ring-2 ring-gray-200 ring-offset-2 ring-offset-white dark:ring-offset-[#111621] transition-all cursor-pointer`}></button>
+                {COLORS.map((col) => (
+                  <button 
+                    key={col.name} 
+                    aria-label={col.name}
+                    onClick={() => toggleFilter(col.hex, selectedColors, setSelectedColors)}
+                    class={`w-8 h-8 rounded-full border transition-all cursor-pointer relative ${selectedColors.includes(col.hex) ? 'ring-2 ring-primary ring-offset-2 dark:ring-offset-[#111621]' : 'border-gray-200 dark:border-gray-700 hover:ring-2 hover:ring-gray-200'}`}
+                    style={{ backgroundColor: col.hex }}
+                  >
+                  </button>
                 ))}
               </div>
             </div>
@@ -169,24 +205,44 @@ export const Shop: React.FC = () => {
                 <span class="material-symbols-outlined text-[20px] text-gray-400">remove</span>
               </h3>
               <div class="grid grid-cols-3 gap-2">
-                {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => (
+                {SIZES.map((size) => (
                   <button 
                     key={size} 
-                    disabled={size === 'XXL'}
-                    class={`h-10 rounded-lg border text-sm font-medium transition-colors ${size === 'S' ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white hover:border-primary hover:text-primary'} ${size === 'XXL' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={() => toggleFilter(size, selectedSizes, setSelectedSizes)}
+                    class={`h-10 rounded-lg border text-sm font-medium transition-colors ${selectedSizes.includes(size) ? 'border-primary bg-primary text-white' : 'border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white hover:border-primary hover:text-primary'}`}
                   >
                     {size}
                   </button>
                 ))}
               </div>
             </div>
+            
+            {/* Clear Filters */}
+            <button 
+                onClick={() => {
+                    setSelectedCategories([]);
+                    setPriceRange(1000);
+                    setSelectedColors([]);
+                    setSelectedSizes([]);
+                }}
+                class="w-full py-2 text-sm text-gray-500 hover:text-primary underline"
+            >
+                Clear All Filters
+            </button>
           </div>
         </aside>
 
         {/* Product Grid */}
         <div class="flex-1">
+          {filteredProducts.length === 0 ? (
+            <div class="flex flex-col items-center justify-center h-96 text-center">
+                <span class="material-symbols-outlined text-6xl text-gray-300 mb-4">search_off</span>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">No products found</h3>
+                <p class="text-gray-500 dark:text-gray-400 mt-2">Try adjusting your filters.</p>
+            </div>
+          ) : (
           <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-12">
-            {MOCK_PRODUCTS.map((product) => (
+            {filteredProducts.map((product) => (
               <div key={product.id} class="group flex flex-col gap-3">
                 <div class="relative aspect-[3/4] overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
                   {product.isNew && (
@@ -208,9 +264,12 @@ export const Shop: React.FC = () => {
                     />
                   </Link>
                   
-                  {/* Hover Quick Add */}
+                  {/* Hover Quick Add - default to first color/size */}
                   <div class="absolute inset-x-4 bottom-4 translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                    <button class="w-full rounded-lg bg-white dark:bg-gray-900 py-3 text-sm font-bold text-gray-900 dark:text-white shadow-lg hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors flex items-center justify-center gap-2">
+                    <button 
+                        onClick={() => addToCart(product, 1, product.colors[0], product.sizes?.[0])}
+                        class="w-full rounded-lg bg-white dark:bg-gray-900 py-3 text-sm font-bold text-gray-900 dark:text-white shadow-lg hover:bg-primary hover:text-white dark:hover:bg-primary transition-colors flex items-center justify-center gap-2"
+                    >
                       <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
                       Quick Add
                     </button>
@@ -235,12 +294,15 @@ export const Shop: React.FC = () => {
               </div>
             ))}
           </div>
-           {/* Load More */}
+          )}
+           {/* Load More (Visual only for now since we have limited data) */}
+           {filteredProducts.length > 0 && (
             <div class="mt-16 flex justify-center">
                 <button class="px-8 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-primary dark:hover:border-primary text-gray-900 dark:text-white font-bold rounded-lg transition-colors shadow-sm">
                     Load More Products
                 </button>
             </div>
+            )}
         </div>
       </div>
     </div>
